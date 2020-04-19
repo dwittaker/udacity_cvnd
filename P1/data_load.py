@@ -36,7 +36,7 @@ class FacialKeypointsDataset(Dataset):
         if(image.shape[2] == 4):
             image = image[:,:,0:3]
         
-        key_pts = self.key_pts_frame.iloc[idx, 1:].as_matrix()
+        key_pts = self.key_pts_frame.iloc[idx, 1:].values
         key_pts = key_pts.astype('float').reshape(-1, 2)
         sample = {'image': image, 'keypoints': key_pts}
 
@@ -67,7 +67,7 @@ class Normalize(object):
         
         # scale keypoints to be centered around 0 with a range of [-1, 1]
         # mean = 100, sqrt = 50, so, pts should be (pts - 100)/50
-        key_pts_copy = (key_pts_copy - 100)/50.0
+        key_pts_copy = (key_pts_copy - 44)/22.0
 
 
         return {'image': image_copy, 'keypoints': key_pts_copy}

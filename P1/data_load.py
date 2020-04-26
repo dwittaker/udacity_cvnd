@@ -6,8 +6,7 @@ import numpy as np
 import matplotlib.image as mpimg
 import pandas as pd
 import cv2
-import torchvision.transforms.functional as TF
-import random
+
 
 
 class FacialKeypointsDataset(Dataset):
@@ -46,45 +45,10 @@ class FacialKeypointsDataset(Dataset):
             sample = self.transform(sample)
 
         return sample
+    
 
-
-
+    
 # tranforms
-
-class FlipHorizontal(object):
-    """Convert a color image to grayscale and normalize the color range to [0,1]."""        
-
-    def __call__(self, sample):
-        image, key_pts = sample['image'], sample['keypoints']
-        
-        image_copy = np.copy(image)
-        key_pts_copy = np.copy(key_pts)
-
-        #print(image_copy.shape)
-        #print(key_pts_copy.shape)
-        
-        image_copy = np.fliplr(image_copy)
-        key_pts_copy[:,0] = image_copy.shape[0] - 1 - key_pts_copy[:,0] #np.fliplr(key_pts_copy)
-
-        return {'image': image_copy, 'keypoints': key_pts_copy}
-
-class FlipVertical(object):
-    """Convert a color image to grayscale and normalize the color range to [0,1]."""        
-
-    def __call__(self, sample):
-        image, key_pts = sample['image'], sample['keypoints']
-        
-        image_copy = np.copy(image)
-        key_pts_copy = np.copy(key_pts)
-
-        #print(image_copy.shape)
-        #print(key_pts_copy.shape)
-        
-        image_copy = np.flipud(image_copy)
-        key_pts_copy[:,1] = image_copy.shape[1] - 1 - key_pts_copy[:,1] #np.fliplr(key_pts_copy)
-
-        return {'image': image_copy, 'keypoints': key_pts_copy}
-
 
 class Normalize(object):
     """Convert a color image to grayscale and normalize the color range to [0,1]."""        
@@ -104,10 +68,11 @@ class Normalize(object):
         
         # scale keypoints to be centered around 0 with a range of [-1, 1]
         # mean = 100, sqrt = 50, so, pts should be (pts - 100)/50
-        key_pts_copy = (key_pts_copy - 100)/50.0
+        key_pts_copy = (key_pts_copy - 44)/22.0
 
 
         return {'image': image_copy, 'keypoints': key_pts_copy}
+
 
 
 class Rescale(object):
@@ -196,14 +161,3 @@ class ToTensor(object):
         
         return {'image': torch.from_numpy(image),
                 'keypoints': torch.from_numpy(key_pts)}
-
-
-class MyRotationTransform:
-    """Rotate by one of the given angles."""
-
-    def __init__(self, angles):
-        self.angles = angles
-
-    def __call__(self, x):
-        angle = random.choice(self.angles)
-        return TF.rotate(x, angle)
